@@ -44,8 +44,8 @@ public class TenantDataSource implements Serializable {
 
     @PostConstruct
     public Map<String, DataSource> getAll() {
-        List<Map<String, Object>> apps = jdbcTemplate.queryForList("SELECT * FROM EA_USER.dbo.APPS", new HashMap<>());
-        apps.stream().forEach(i -> System.out.println(i.get("db_name").toString()));
+        List<Map<String, Object>> apps = jdbcTemplate.queryForList("SELECT * FROM apps", new HashMap<>());
+        apps.forEach(i -> System.out.println(i.get("db_name").toString()));
         Map<String, DataSource> result = new HashMap<>();
         for (Map<String, Object> app : apps) {
             DataSource dataSource = getDataSource(app);
@@ -54,17 +54,37 @@ public class TenantDataSource implements Serializable {
         return result;
     }
 
+//     For MYSQL Server
+//    private DataSource createDataSource(Map<String, Object> app) {
+//        if (app != null) {
+//            DataSourceBuilder<?> factory = DataSourceBuilder
+//                    .create().driverClassName(environment.getProperty("com.microsoft.sqlserver.jdbc.SQLServerDriver"))
+//                    .username(environment.getProperty("spring.datasource.username"))
+//                    .password(environment.getProperty("spring.datasource.password"))
+//                    .url("jdbc:sqlserver://GHOST\\SQLEXPRESS:52598;database="+ app.get("db_name").toString() +";encrypt=true;trustServerCertificate=true");
+//            HikariConfig config = new HikariConfig();
+//            config.setSchema(app.get("db_name").toString());
+//            config.setDataSource(factory.build());
+//            config.setMaximumPoolSize(10);
+//            return new HikariDataSource(config);
+//        }
+//        return null;
+//    }
+
     private DataSource createDataSource(Map<String, Object> app) {
         if (app != null) {
             DataSourceBuilder<?> factory = DataSourceBuilder
-                    .create().driverClassName(environment.getProperty("com.microsoft.sqlserver.jdbc.SQLServerDriver"))
+                    .create()
+                    .driverClassName(environment.getProperty("com.mysql.cj.jdbc.Driver")) // MySQL Driver
                     .username(environment.getProperty("spring.datasource.username"))
                     .password(environment.getProperty("spring.datasource.password"))
-                    .url("jdbc:sqlserver://GHOST\\SQLEXPRESS:52598;database="+ app.get("db_name").toString() +";encrypt=true;trustServerCertificate=true");
+                    .url("jdbc:mysql://localhost:3306/" + app.get("db_name").toString() +
+                            "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"); // MySQL connection URL
+
             HikariConfig config = new HikariConfig();
-            config.setSchema(app.get("db_name").toString());
+            config.setSchema(app.get("db_name").toString()); // MySQL schema
             config.setDataSource(factory.build());
-            config.setMaximumPoolSize(10);
+            config.setMaximumPoolSize(10); // Connection pool size
             return new HikariDataSource(config);
         }
         return null;

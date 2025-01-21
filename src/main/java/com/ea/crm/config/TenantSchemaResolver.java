@@ -4,17 +4,15 @@ import com.ea.crm.config.TenantContext;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
-public class TenantSchemaResolver implements CurrentTenantIdentifierResolver {
+public class TenantSchemaResolver implements CurrentTenantIdentifierResolver<String> {
 
     @Override
     public String resolveCurrentTenantIdentifier() {
         String currentTenant =  TenantContext.getCurrentTenant();
-        if(currentTenant != null){
-            return currentTenant;
-        } else {
-            return "public";
-        }
+        return Objects.requireNonNullElse(currentTenant, "public");
     }
 
     @Override

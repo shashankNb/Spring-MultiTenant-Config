@@ -47,7 +47,7 @@ public class UserInfoService {
 
     public Map<String, Object> decodeJwtToken(String token) {
         try {
-            Map<String, Object> claims = Jwts.parserBuilder()
+            Map<String, Object> claims = Jwts.parser()
                     .setSigningKey(getSignInKey())
                     .build()
                     .parseClaimsJws(token)

@@ -33,8 +33,8 @@ public class HibernateConfig {
     @Bean
     LocalContainerEntityManagerFactoryBean entityManagerFactory(
             DataSource dataSource,
-            MultiTenantConnectionProvider multiTenantConnectionProviderImpl,
-            CurrentTenantIdentifierResolver currentTenantIdentifierResolverImpl
+            MultiTenantConnectionProvider<Object> multiTenantConnectionProviderImpl,
+            CurrentTenantIdentifierResolver<String> currentTenantIdentifierResolverImpl
     ) throws SQLException {
 
         Map<String, Object> jpaPropertiesMap = new HashMap<>(jpaProperties.getProperties());
